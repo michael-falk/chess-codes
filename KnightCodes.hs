@@ -21,13 +21,23 @@ moveBishop (c,r) =
         candidates = range >>= diagonals
     in filter inBoard candidates
 
-in3 :: Piece -> [[Piece]]
-in3 start = 
-    let move = (makeMove moveKnight)
-    in  [[start]] >>= move >>= move >>= move
+moveRook :: Piece -> [Piece]
+moveRook (c,r) = 
+    let range = [1..8]
+        straights i = [(c+i,r), (c,r-i), (c-i,r), (c,r+i)]
+        candidates = range >>= straights
+    in filter inBoard candidates
 
-reachIn :: (Piece -> [Piece]) -> Piece -> Int -> Maybe [[Piece]]
-reachIn move start n = 
+moveQueen :: Piece -> [Piece]  
+moveQueen (c,r) =
+    let range = [1..8]
+        star i = [(c+i,r), (c,r-i), (c-i,r), (c,r+i),
+                (c+i,r+i), (c+i,r-i), (c-i,r+i), (c-i,r-i)]
+        candidates = range >>= star
+    in filter inBoard candidates
+
+pathsIn :: (Piece -> [Piece]) -> Piece -> Int -> Maybe [[Piece]]
+pathsIn move start n = 
     let lists = take (n + 1) $ iterate (>>= makeMove move) [[start]]
     in  case lists of []    -> Nothing
                       lists -> Just (last lists)
